@@ -3,15 +3,14 @@
 	"id": "save-my-tools",
 	"version": "${version}",
 	"name": "Save My Tools",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Simple clientside mod that prevents you from accidentally breaking your tools.",
 	"authors": [
-		"Me!"
+		"Borknbeans"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/borknbeans/Save-My-Tools"
 	},
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/save-my-tools/icon.png",
 	"environment": "*",
 	"entrypoints": {
