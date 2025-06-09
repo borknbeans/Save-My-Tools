@@ -12,6 +12,7 @@ import net.minecraft.item.HoeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ShovelItem;
 import net.minecraft.item.ToolItem;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -26,14 +27,20 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import borknbeans.savemytools.SaveMyToolsClient;
+
 @Mixin(ClientPlayerInteractionManager.class)
 public abstract class ClientPlayerInteractionManagerMixin {
+
+    private static final Text MESSAGE = Text.of("This tool is going to break!");
+
     @Inject(method = "attackEntity", at = @At("HEAD"), cancellable = true)
     public void attackEntity(PlayerEntity player, Entity target, CallbackInfo info) {
         if (player != null && target != null) {
             ItemStack stack = player.getStackInHand(Hand.MAIN_HAND);
-            if (stack.getItem() instanceof ToolItem && stack.getDamage() >= stack.getMaxDamage() - 1) {
+            if (stack.getItem() instanceof ToolItem && stack.getDamage() >= stack.getMaxDamage() - 1 && !SaveMyToolsClient.ignoreWarningKeyBind.isPressed()) {
                 info.cancel();
+                player.sendMessage(Text.of(MESSAGE), true);
             }
         }
     }
@@ -44,8 +51,9 @@ public abstract class ClientPlayerInteractionManagerMixin {
 
         if (client != null && client.player != null) {
             ItemStack stack = client.player.getStackInHand(Hand.MAIN_HAND);
-            if (stack.getItem() instanceof ToolItem && stack.getDamage() >= stack.getMaxDamage() - 1) {
+            if (stack.getItem() instanceof ToolItem && stack.getDamage() >= stack.getMaxDamage() - 1 && !SaveMyToolsClient.ignoreWarningKeyBind.isPressed()) {
                 info.setReturnValue(false);
+                client.player.sendMessage(Text.of(MESSAGE), true);
             }
         }
     }
@@ -55,7 +63,7 @@ public abstract class ClientPlayerInteractionManagerMixin {
         if (player != null) {
             ItemStack stack = player.getStackInHand(Hand.MAIN_HAND);
             
-            if (stack.getItem() instanceof ToolItem && stack.getDamage() >= stack.getMaxDamage() - 1) {
+            if (stack.getItem() instanceof ToolItem && stack.getDamage() >= stack.getMaxDamage() - 1 && !SaveMyToolsClient.ignoreWarningKeyBind.isPressed()) {
                 BlockPos blockPos = hitResult.getBlockPos();
                 
                 Block block = player.getWorld().getBlockState(blockPos).getBlock();
@@ -63,14 +71,17 @@ public abstract class ClientPlayerInteractionManagerMixin {
                 
                 if (stack.getItem() instanceof AxeItem && (block.asItem().getName().getString().toLowerCase().contains("log") || VanillaStrippableBlocks.contains(block))) {
                     info.setReturnValue(ActionResult.FAIL);
+                    player.sendMessage(Text.of(MESSAGE), true);
                 }
 
                 if (stack.getItem() instanceof ShovelItem && VanillaPathableBlocks.contains(block)) {
                     info.setReturnValue(ActionResult.FAIL);
+                    player.sendMessage(Text.of(MESSAGE), true);
                 }
 
                 if (stack.getItem() instanceof HoeItem && VanillaTillableBlocks.contains(block)) {
                     info.setReturnValue(ActionResult.FAIL);
+                    player.sendMessage(Text.of(MESSAGE), true);
                 }
             }
         }
