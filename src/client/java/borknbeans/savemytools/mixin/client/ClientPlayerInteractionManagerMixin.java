@@ -9,8 +9,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.HoeItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.MiningToolItem;
+import net.minecraft.item.MaceItem;
 import net.minecraft.item.ShovelItem;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
@@ -38,7 +39,7 @@ public abstract class ClientPlayerInteractionManagerMixin {
     public void attackEntity(PlayerEntity player, Entity target, CallbackInfo info) {
         if (player != null && target != null) {
             ItemStack stack = player.getStackInHand(Hand.MAIN_HAND);
-            if (stack.getItem() instanceof MiningToolItem && stack.getDamage() >= stack.getMaxDamage() - 1 && !SaveMyToolsClient.ignoreWarningKeyBind.isPressed()) {
+            if (isToolItem(stack) && stack.getDamage() >= stack.getMaxDamage() - 1 && !SaveMyToolsClient.ignoreWarningKeyBind.isPressed()) {
                 info.cancel();
                 player.sendMessage(Text.of(MESSAGE), true);
             }
@@ -51,7 +52,7 @@ public abstract class ClientPlayerInteractionManagerMixin {
 
         if (client != null && client.player != null) {
             ItemStack stack = client.player.getStackInHand(Hand.MAIN_HAND);
-            if (stack.getItem() instanceof MiningToolItem && stack.getDamage() >= stack.getMaxDamage() - 1 && !SaveMyToolsClient.ignoreWarningKeyBind.isPressed()) {
+            if (isToolItem(stack) && stack.getDamage() >= stack.getMaxDamage() - 1 && !SaveMyToolsClient.ignoreWarningKeyBind.isPressed()) {
                 info.setReturnValue(false);
                 client.player.sendMessage(Text.of(MESSAGE), true);
             }
@@ -63,7 +64,7 @@ public abstract class ClientPlayerInteractionManagerMixin {
         if (player != null) {
             ItemStack stack = player.getStackInHand(Hand.MAIN_HAND);
             
-            if (stack.getItem() instanceof MiningToolItem && stack.getDamage() >= stack.getMaxDamage() - 1 && !SaveMyToolsClient.ignoreWarningKeyBind.isPressed()) {
+            if (isToolItem(stack) && stack.getDamage() >= stack.getMaxDamage() - 1 && !SaveMyToolsClient.ignoreWarningKeyBind.isPressed()) {
                 BlockPos blockPos = hitResult.getBlockPos();
                 
                 Block block = player.getWorld().getBlockState(blockPos).getBlock();
@@ -85,6 +86,11 @@ public abstract class ClientPlayerInteractionManagerMixin {
                 }
             }
         }
+    }
+
+    private boolean isToolItem(ItemStack stack) {
+        Item item = stack.getItem();
+        return item instanceof AxeItem || item instanceof ShovelItem || item instanceof HoeItem || item instanceof MaceItem || stack.getMaxDamage() > 0;
     }
     
     private static Set<Block> VanillaStrippableBlocks = Set.of(
